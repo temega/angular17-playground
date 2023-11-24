@@ -17,21 +17,23 @@ import { DummyComponent } from './dummy/dummy.component';
     <button (click)="incrementSignal()">Increment Signal</button>
     <button (click)="incrementProp()">Increment Prop</button>
     <button (click)="incrementProp(); incrementSignal();">Increment Prop and Signal</button>
-    <div class="box">
-      <h2>Prop</h2>
-      @for(i of loopArray; track i) {
-        <app-property [count]="counterProp"></app-property>
-      }
-    </div>
-    <div class="box">
-      <h2>Signal</h2>
-      @for(i of loopArray; track i) {
-        <app-signal [count]="counterSignal"></app-signal>
-      }
+    <div class="wrapper">
+      <div class="box">
+        <h2>Prop</h2>
+        @for(i of loopArray; track i) {
+          <app-property [count]="counterProp"></app-property>
+        }
+      </div>
+      <div class="box">
+        <h2>Signal</h2>
+        @for(i of loopArray; track i) {
+          <app-signal [count]="counterSignal"></app-signal>
+        }
+      </div>
     </div>
 
     <div class="box">
-      @for(i of loopArray; track i) {
+      @for(i of dymmyArray; track i) {
         <app-dummy></app-dummy>
       }
     </div>
@@ -41,7 +43,12 @@ import { DummyComponent } from './dummy/dummy.component';
   `,
   styles: [
     `
+      .wrapper {
+        display: flex;
+        
+      }
       .box {
+        
         max-height: 300px;
         overflow: auto;
       }
@@ -62,7 +69,8 @@ export class AppComponent implements OnInit{
   counterSignal = 0;
   counterProp = 0;
 
-  loopArray = Array.from({length: 1000}, (v, k) => k+1); 
+  loopArray = Array.from({length: 10000}, (v, k) => k+1);
+  dymmyArray = Array.from({length: 100000}, (v, k) => k+1); 
 
   public incrementSignal() {
     this.counterSignal++;
