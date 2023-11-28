@@ -1,4 +1,4 @@
-import { Component, Input, Signal, SimpleChanges, signal } from '@angular/core';
+import { Component, Input, Signal, SimpleChanges, WritableSignal, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <span class="count">{{(count)}}</span>&nbsp;
+    <span class="count">{{(countSignal())}}</span>&nbsp;
   `,
   styles: 
     `
@@ -23,6 +23,6 @@ export class SignalComponent {
   }
 
 
-  @Input() count: number = 0;
+  @Input() countSignal: WritableSignal<number> = signal(0);
 
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit, afterRender, signal, computed, ChangeDetectionStrategy, ChangeDetectorRef, SimpleChange } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { PropertyComponent } from './property/property.component';
@@ -18,21 +18,24 @@ import { MoreSignalsComponent } from './more-signals/more-signals.component';
 
     <button (click)="incrementProp()">Increment Prop</button>
     <button (click)="incrementSignal()">Increment Signal</button>
+    <hr>
+    <button (click)="incrementRandomProp()">Random Increment Prop</button>
+    <button (click)="incrementRandomSignals()">Random Increment Signal</button>
+    <hr>
     <button (click)="incrementProp(); incrementSignal();">Increment Prop and Signal</button>
     <br>
 
     <div class="wrapper">
       <div class="box">
         <h2>Prop {{numberOfItems}}</h2>
-        @for(i of propsArray; track i) {
-          <app-property [count]="counterProp"></app-property>
+        @for(item of propsArray; track item) {
+          <app-property [count]="item"></app-property>
         }
       </div>
       <div class="box">
         <h2>Signal {{numberOfItems}}</h2>
-        @for(item of signalsArray(); track item) {
-          
-          <app-signal [count]="item"></app-signal>
+        @for(item of signalsArray; track item) {
+          <app-signal [countSignal]="item"></app-signal>
         }
       </div>
     </div>
@@ -67,16 +70,12 @@ import { MoreSignalsComponent } from './more-signals/more-signals.component';
   ],
 })
 export class AppComponent implements OnInit{
-  constructor (private ref: ChangeDetectorRef) {
-    ref.detach();
-    setInterval(() => {
-      this.ref.detectChanges();
-    }, 2000)
+  constructor () {
+    
   }
   ngOnInit(): void {
 
   }
-
 
   numberOfItems = 1000;
 
@@ -85,23 +84,45 @@ export class AppComponent implements OnInit{
   counterProp = 0;
   counterSignal = signal(0);
 
-  propsArray = Array.from({length: this.numberOfItems}, (v, k) => k+1);
+  propsArray = Array.from({length: this.numberOfItems}, (v, k) => 0);
   
-  // I might create an array of N but each item points to the same signal.
-  // I need to create an array with N different signals
-  signalsArray = computed(() => Array.from({length: this.numberOfItems}, (v, k) => k).map(v => this.counterSignal()));
+  signalsArray = this.arrayOfUniqueSignals(0);
   
-  dymmyArray = Array.from({length: this.numberOfItems}, (v, k) => k+1); 
+  dymmyArray = Array.from({length: this.numberOfItems}, (v, k) => 0); 
 
+  private arrayOfUniqueSignals(initialValue: number) {
+    return Array.from({ length: this.numberOfItems }, () => signal(initialValue));
+  }
 
   public incrementSignal() {
-    this.counterSignal.update(val => val + 1);
-    
-    
-    
+    // this.counterSignal.update(val => val + 1);
+
+    // Loop over array and change their values
+    this.signalsArray.forEach((signalVal, index, self) => {
+      self[index].update(curr => curr + 1);
+    });
   }
+
+  public incrementRandomSignals() {
+    this.signalsArray.forEach((signalVal, index, self) => {
+      if (this.randomness()) self[index].update(curr => curr + 1);
+    });
+  }
+
+  public incrementRandomProp() {
+    this.propsArray.forEach((currVal, index, self) => {
+      if (this.randomness()) self[index] = currVal + 1;
+    });
+  }
+
+  private randomness() {
+    return Math.random() < 0.5;
+  }
+
   public incrementProp() {
-    this.counterProp++;
+    this.propsArray.forEach((currVal, index, self) => {
+      self[index] = currVal + 1;
+    });
   }
   
 }
