@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, afterRender, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { PropertyComponent } from './property/property.component';
@@ -71,13 +71,16 @@ import { MoreSignalsComponent } from './more-signals/more-signals.component';
 })
 export class AppComponent implements OnInit{
   constructor () {
-    
+    afterRender(() => {
+      console.timeEnd('randomSignal');
+      console.timeEnd('randomProp');
+    })
   }
   ngOnInit(): void {
 
   }
 
-  numberOfItems = 1000;
+  numberOfItems = 5000;
 
   title = `angular17-playground`;
 
@@ -104,12 +107,14 @@ export class AppComponent implements OnInit{
   }
 
   public incrementRandomSignals() {
+    console.time('randomSignal');
     this.signalsArray.forEach((signalVal, index, self) => {
       if (this.randomness()) self[index].update(curr => curr + 1);
     });
   }
 
   public incrementRandomProp() {
+    console.time('randomProp');
     this.propsArray.forEach((currVal, index, self) => {
       if (this.randomness()) self[index] = currVal + 1;
     });
