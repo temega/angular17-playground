@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <span class="count">{{countSignal()}}</span>&nbsp;
+    <span class="count">{{(count)}}</span>&nbsp;
   `,
   styles: 
     `
@@ -23,10 +23,6 @@ export class SignalComponent {
   }
 
 
-  countSignal = signal(0);
- 
+  @Input() count: number = 0;
 
-  @Input() set count(val: number) {
-    this.countSignal.set(val);
-  };
 }
