@@ -17,11 +17,11 @@ import { MoreSignalsComponent } from './more-signals/more-signals.component';
   template: `
     <h1>{{title}}!</h1>
     <div>
-      <input [(ngModel)]="numberOfItems" />
+      <input [ngModel]="numberOfItems()" (ngModelChange)="numberOfItems.set($event)" />
     </div>
     <div class="wrapper">
       <div class="box">
-        <h3>{{numberOfItems}} component property binds</h3>
+        <h3>{{numberOfItems()}} component property binds</h3>
         <div>
           <button (click)="incrementProp()">Increment all</button>
           <button (click)="incrementRandomProp()">Random Increment</button>
@@ -31,7 +31,7 @@ import { MoreSignalsComponent } from './more-signals/more-signals.component';
         }
       </div>
       <div class="box">
-        <h3>{{numberOfItems}} Signal binds</h3>
+        <h3>{{numberOfItems()}} Signal binds</h3>
         <div>
           <button (click)="incrementSignal()">Increment all</button>
           <button (click)="incrementRandomSignals()">Random Increment Signal</button>
@@ -70,14 +70,15 @@ export class AppComponent implements OnInit{
 
   }
 
-  numberOfItems = 1000;
+  numberOfItems = signal(1000);
 
   title = `Angular 17 Signals Speedtest`; 
   
   private arrayOfValuesGenerator(initialValue: () => any) {
-    return Array.from({ length: this.numberOfItems }, () => initialValue());
+    return Array.from({ length: this.numberOfItems() }, () => initialValue());
   }
-  
+
+
   
   signalsArray = this.arrayOfValuesGenerator(() => signal(0));
 
@@ -90,8 +91,8 @@ export class AppComponent implements OnInit{
   public incrementRandomSignals() {
     console.time('timer');
     this.signalsArray.forEach((value, index, array) => {
-      if (this.randomness()) {
-        value.update((current: any) => current + 1)
+      if (this.chance(50)) {
+        value.update((current: number) => current + 1)
       };
     });
   }
@@ -107,17 +108,17 @@ export class AppComponent implements OnInit{
   public incrementRandomProp() {
     console.time('timer');
     this.propsArray.forEach((value, index, array) => {
-      if (this.randomness()) {
+      if (this.chance(50)) {
         array[index] = value + 1;
       };
     });
   }
 
 
-  private randomness() {
-    return Math.random() < 0.2;
+  private chance(percentage: number): boolean {
+    const chance = percentage / 100;
+    return Boolean(Math.random() < chance);
   }
 
-  
-  
+
 }
