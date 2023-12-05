@@ -1,4 +1,4 @@
-import { Component, OnInit, afterRender, computed, signal } from '@angular/core';
+import { Component, OnInit, WritableSignal, afterRender, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -70,58 +70,54 @@ export class AppComponent implements OnInit{
 
   }
 
-  numberOfItems = 500;
+  numberOfItems = 1000;
 
-  title = `Angular 17 Signals Speedtest`;
-
-  counterProp = 0;
-  counterSignal = signal(0);
-
-  propsArray = Array.from({length: this.numberOfItems}, (v, k) => 0);
+  title = `Angular 17 Signals Speedtest`; 
   
-  signalsArray = this.arrayOfUniqueSignals(0);
-  
-
-  private arrayOfUniqueSignals(initialValue: number) {
-    return Array.from({ length: this.numberOfItems }, () => signal(initialValue));
+  private arrayOfValuesGenerator(initialValue: () => any) {
+    return Array.from({ length: this.numberOfItems }, () => initialValue());
   }
+  
+  
+  signalsArray = this.arrayOfValuesGenerator(() => signal(0));
 
   public incrementSignal() {
-    this.signalsArray.forEach((signalVal, index, self) => {
-      self[index].update(curr => curr + 1);
+    this.signalsArray.forEach((signalVal, index, arr) => {
+      arr[index].update((curr: number) => curr + 1);
     });
   }
 
   public incrementRandomSignals() {
     console.time('timer');
-    let changeCounter = 0;
-    this.signalsArray.forEach((signalVal, index, self) => {
+    this.signalsArray.forEach((value, index, array) => {
       if (this.randomness()) {
-        self[index].update(curr => curr + 1)
-        changeCounter++;
+        value.update((current: any) => current + 1)
       };
+    });
+  }
+
+  propsArray = this.arrayOfValuesGenerator(() => 0);
+  
+  public incrementProp() {
+    this.propsArray.forEach((value, index, array) => {
+      array[index] = value + 1;
     });
   }
 
   public incrementRandomProp() {
     console.time('timer');
-    let changeCounter = 0;
-    this.propsArray.forEach((currVal, index, self) => {
+    this.propsArray.forEach((value, index, array) => {
       if (this.randomness()) {
-        self[index] = currVal + 1;
-        changeCounter++;
+        array[index] = value + 1;
       };
     });
   }
 
+
   private randomness() {
-    return Math.random() < 0.5;
+    return Math.random() < 0.2;
   }
 
-  public incrementProp() {
-    this.propsArray.forEach((currVal, index, self) => {
-      self[index] = currVal + 1;
-    });
-  }
+  
   
 }
