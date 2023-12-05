@@ -1,9 +1,10 @@
-import { Component, OnInit, afterRender, signal } from '@angular/core';
+import { Component, OnInit, afterRender, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { PropertyComponent } from './property/property.component';
 import { SignalComponent } from './signal/signal.component';
-import { DummyComponent } from './dummy/dummy.component';
+
 import { AttributesVsPropsComponent } from './attributes-vs-props/attributes-vs-props.component';
 import { MoreSignalsComponent } from './more-signals/more-signals.component';
 
@@ -11,49 +12,38 @@ import { MoreSignalsComponent } from './more-signals/more-signals.component';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, PropertyComponent, SignalComponent, DummyComponent, AttributesVsPropsComponent, MoreSignalsComponent],
+  imports: [CommonModule, FormsModule, RouterOutlet, PropertyComponent, SignalComponent, AttributesVsPropsComponent, MoreSignalsComponent],
   providers: [],
   template: `
-    <h1>Welcome to {{title}}!</h1>
-
-    <button (click)="incrementProp()">Increment Prop</button>
-    <button (click)="incrementSignal()">Increment Signal</button>
-    <hr>
-    <button (click)="incrementRandomProp()">Random Increment Prop</button>
-    <button (click)="incrementRandomSignals()">Random Increment Signal</button>
-    <hr>
-    <button (click)="incrementProp(); incrementSignal();">Increment Prop and Signal</button>
-    <br>
-
+    <h1>{{title}}!</h1>
+    <div>
+      <input [(ngModel)]="numberOfItems" />
+    </div>
     <div class="wrapper">
       <div class="box">
-        <h2>Prop {{numberOfItems}}</h2>
+        <h3>{{numberOfItems}} component property binds</h3>
+        <div>
+          <button (click)="incrementProp()">Increment all</button>
+          <button (click)="incrementRandomProp()">Random Increment</button>
+        </div>
         @for(item of propsArray; track item) {
           <app-property [count]="item"></app-property>
         }
       </div>
       <div class="box">
-        <h2>Signal {{numberOfItems}}</h2>
+        <h3>{{numberOfItems}} Signal binds</h3>
+        <div>
+          <button (click)="incrementSignal()">Increment all</button>
+          <button (click)="incrementRandomSignals()">Random Increment Signal</button>
+        </div>
         @for(item of signalsArray; track item) {
           <app-signal [countSignal]="item"></app-signal>
         }
       </div>
     </div>
 
-    <div class="box">
-      @for(i of dymmyArray; track i) {
-        <app-dummy></app-dummy>
-      }
-    </div>
-<hr>
-    <attributes-vs-props></attributes-vs-props>
-<hr>
-
-      <more-signals></more-signals>
-
-
-
-    <router-outlet></router-outlet>
+    
+    
   `,
   styles: [
     `
@@ -63,8 +53,9 @@ import { MoreSignalsComponent } from './more-signals/more-signals.component';
       }
       .box {
         
-        max-height: 300px;
+        max-height: 600px;
         overflow: auto;
+        flex: 1 0;
       }
     `
   ],
@@ -72,17 +63,16 @@ import { MoreSignalsComponent } from './more-signals/more-signals.component';
 export class AppComponent implements OnInit{
   constructor () {
     afterRender(() => {
-      console.timeEnd('randomSignal');
-      console.timeEnd('randomProp');
+      console.timeEnd('timer');
     })
   }
   ngOnInit(): void {
 
   }
 
-  numberOfItems = 5000;
+  numberOfItems = 500;
 
-  title = `angular17-playground`;
+  title = `Angular 17 Signals Speedtest`;
 
   counterProp = 0;
   counterSignal = signal(0);
@@ -91,32 +81,36 @@ export class AppComponent implements OnInit{
   
   signalsArray = this.arrayOfUniqueSignals(0);
   
-  dymmyArray = Array.from({length: this.numberOfItems}, (v, k) => 0); 
 
   private arrayOfUniqueSignals(initialValue: number) {
     return Array.from({ length: this.numberOfItems }, () => signal(initialValue));
   }
 
   public incrementSignal() {
-    // this.counterSignal.update(val => val + 1);
-
-    // Loop over array and change their values
     this.signalsArray.forEach((signalVal, index, self) => {
       self[index].update(curr => curr + 1);
     });
   }
 
   public incrementRandomSignals() {
-    console.time('randomSignal');
+    console.time('timer');
+    let changeCounter = 0;
     this.signalsArray.forEach((signalVal, index, self) => {
-      if (this.randomness()) self[index].update(curr => curr + 1);
+      if (this.randomness()) {
+        self[index].update(curr => curr + 1)
+        changeCounter++;
+      };
     });
   }
 
   public incrementRandomProp() {
-    console.time('randomProp');
+    console.time('timer');
+    let changeCounter = 0;
     this.propsArray.forEach((currVal, index, self) => {
-      if (this.randomness()) self[index] = currVal + 1;
+      if (this.randomness()) {
+        self[index] = currVal + 1;
+        changeCounter++;
+      };
     });
   }
 
