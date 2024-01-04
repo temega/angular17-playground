@@ -23,7 +23,7 @@ import { MoreSignalsComponent } from './more-signals/more-signals.component';
       <div class="box">
         <h3>{{numberOfItems()}} component property binds</h3>
         <div>
-          <button (click)="incrementProp()">Increment all</button>
+          <button (click)="incrementAllProp()">Increment all</button>
           <button (click)="incrementRandomProp()">Random Increment</button>
         </div>
         @for(item of propsArray; track item) {
@@ -33,7 +33,7 @@ import { MoreSignalsComponent } from './more-signals/more-signals.component';
       <div class="box">
         <h3>{{numberOfItems()}} Signal binds</h3>
         <div>
-          <button (click)="incrementSignal()">Increment all</button>
+          <button (click)="incrementAllSignal()">Increment all</button>
           <button (click)="incrementRandomSignals()">Random Increment Signal</button>
         </div>
         @for(item of signalsArray; track item) {
@@ -82,9 +82,10 @@ export class AppComponent implements OnInit{
   
   signalsArray = this.arrayOfValuesGenerator(() => signal(0));
 
-  public incrementSignal() {
-    this.signalsArray.forEach((signalVal, index, arr) => {
-      arr[index].update((curr: number) => curr + 1);
+  public incrementAllSignal() {
+    console.time('timer');    
+    this.signalsArray.forEach((value, index, arr) => {
+      value.update((curr: number) => curr + 1);
     });
   }
 
@@ -96,10 +97,11 @@ export class AppComponent implements OnInit{
       };
     });
   }
-
+  
   propsArray = this.arrayOfValuesGenerator(() => 0);
   
-  public incrementProp() {
+  public incrementAllProp() {
+    console.time('timer');
     this.propsArray.forEach((value, index, array) => {
       array[index] = value + 1;
     });
